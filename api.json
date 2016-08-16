@@ -1,0 +1,165 @@
+{
+  "apidoc": {
+    "version": "0.11.26"
+  },
+  "name": "football-data",
+  "base_url": "http://api.football-data.org/v1",
+  "description": "",
+  "models": {
+    "competition": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "long",
+          "description": "ID of the competition"
+        },
+        {
+          "name": "caption",
+          "type": "string",
+          "description": "Competition long name"
+        },
+        {
+          "name": "league",
+          "type": "league",
+          "description": "The league the competition belongs to"
+        },
+        {
+          "name": "year",
+          "type": "string",
+          "description": "year of the competition"
+        },
+        {
+          "name": "currentMatchday",
+          "type": "integer",
+          "description": "current day of the competition"
+        },
+        {
+          "name": "numberOfTeams",
+          "type": "integer",
+          "description": "Number of teams in the competition"
+        },
+        {
+          "name": "numberOfGames",
+          "type": "integer",
+          "description": "Number of matches in the competition"
+        },
+        {
+          "name": "lastUpdated",
+          "type": "date-time-iso8601",
+          "description": "Timestamp of the last update"
+        }
+      ]
+    }
+  },
+  "enums": {
+    "league": {
+      "name": "league",
+      "description": "Supported leagues",
+      "values": [
+        {
+          "name": "BL1",
+          "description": "1. Bundesliga"
+        },
+        {
+          "name": "BL2",
+          "description": "2. Bundesliga"
+        },
+        {
+          "name": "BL3",
+          "description": "3. Bundesliga"
+        },
+        {
+          "name": "DFB",
+          "description": "Dfb-Cup"
+        },
+        {
+          "name": "PL",
+          "description": "Premiere League"
+        },
+        {
+          "name": "EL1",
+          "description": "League One"
+        },
+        {
+          "name": "ELC",
+          "description": "Championship"
+        },
+        {
+          "name": "FAC",
+          "description": "FA-Cup"
+        },
+        {
+          "name": "SA",
+          "description": "Serie A"
+        },
+        {
+          "name": "SB",
+          "description": "Serie B"
+        },
+        {
+          "name": "PD",
+          "description": "Primera Division"
+        },
+        {
+          "name": "SD",
+          "description": "Segunda Division"
+        },
+        {
+          "name": "CDR",
+          "description": "Copa del Rey"
+        },
+        {
+          "name": "FL1",
+          "description": "Ligue 1"
+        },
+        {
+          "name": "FL2",
+          "description": "Ligue 2"
+        },
+        {
+          "name": "DED",
+          "description": "Eredivisie"
+        },
+        {
+          "name": "PPL",
+          "description": "Primeira Liga"
+        },
+        {
+          "name": "GSL",
+          "description": "Super League"
+        },
+        {
+          "name": "CL",
+          "description": "Champions-League"
+        },
+        {
+          "name": "EL",
+          "description": "UEFA-Cup"
+        },
+        {
+          "name": "EC",
+          "description": "European-Cup of Nations"
+        },
+        {
+          "name": "WC",
+          "description": "World-Cup"
+        }
+      ]
+    }
+  },
+  "resources": {
+    "competition": {
+      "path": "/competitions",
+      "operations": [
+        {
+          "method": "GET",
+          "responses": {
+            "200": {
+              "type": "[competition]"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
