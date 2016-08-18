@@ -16,6 +16,73 @@ package com.giogar.football.data.v0.models {
     lastUpdated: _root_.org.joda.time.DateTime
   )
 
+  case class Fixture(
+    date: _root_.org.joda.time.DateTime,
+    status: com.giogar.football.data.v0.models.FixtureStatus,
+    matchday: Int,
+    homeTeamName: String,
+    awayTeamName: String,
+    result: com.giogar.football.data.v0.models.Result
+  )
+
+  case class Fixtures(
+    fixtures: Seq[com.giogar.football.data.v0.models.Fixture]
+  )
+
+  case class Result(
+    goalsHomeTeam: _root_.scala.Option[Int] = None,
+    goalsAwayTeam: _root_.scala.Option[Int] = None,
+    halfTime: _root_.scala.Option[com.giogar.football.data.v0.models.Score] = None,
+    extraTime: _root_.scala.Option[com.giogar.football.data.v0.models.Score] = None,
+    penaltyShootout: _root_.scala.Option[com.giogar.football.data.v0.models.Score] = None
+  )
+
+  case class Score(
+    goalsHomeTeam: Int,
+    goalsAwayTeam: Int
+  )
+
+  /**
+   * status of the fixture
+   */
+  sealed trait FixtureStatus
+
+  object FixtureStatus {
+
+    case object Scheduled extends FixtureStatus { override def toString = "SCHEDULED" }
+    case object Timed extends FixtureStatus { override def toString = "TIMED" }
+    case object Postponed extends FixtureStatus { override def toString = "POSTPONED" }
+    case object Canceled extends FixtureStatus { override def toString = "CANCELED" }
+    case object InPlay extends FixtureStatus { override def toString = "IN_PLAY" }
+    case object Finished extends FixtureStatus { override def toString = "FINISHED" }
+
+    /**
+     * UNDEFINED captures values that are sent either in error or
+     * that were added by the server after this library was
+     * generated. We want to make it easy and obvious for users of
+     * this library to handle this case gracefully.
+     *
+     * We use all CAPS for the variable name to avoid collisions
+     * with the camel cased values above.
+     */
+    case class UNDEFINED(override val toString: String) extends FixtureStatus
+
+    /**
+     * all returns a list of all the valid, known values. We use
+     * lower case to avoid collisions with the camel cased values
+     * above.
+     */
+    val all = Seq(Scheduled, Timed, Postponed, Canceled, InPlay, Finished)
+
+    private[this]
+    val byName = all.map(x => x.toString.toLowerCase -> x).toMap
+
+    def apply(value: String): FixtureStatus = fromString(value).getOrElse(UNDEFINED(value))
+
+    def fromString(value: String): _root_.scala.Option[FixtureStatus] = byName.get(value.toLowerCase)
+
+  }
+
   /**
    * Supported leagues
    */
@@ -169,6 +236,36 @@ package com.giogar.football.data.v0.models {
       }
     }
 
+    implicit val jsonReadsFootballDataFixtureStatus = new play.api.libs.json.Reads[com.giogar.football.data.v0.models.FixtureStatus] {
+      def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.giogar.football.data.v0.models.FixtureStatus] = {
+        js match {
+          case v: play.api.libs.json.JsString => play.api.libs.json.JsSuccess(com.giogar.football.data.v0.models.FixtureStatus(v.value))
+          case _ => {
+            (js \ "value").validate[String] match {
+              case play.api.libs.json.JsSuccess(v, _) => play.api.libs.json.JsSuccess(com.giogar.football.data.v0.models.FixtureStatus(v))
+              case err: play.api.libs.json.JsError => err
+            }
+          }
+        }
+      }
+    }
+
+    def jsonWritesFootballDataFixtureStatus(obj: com.giogar.football.data.v0.models.FixtureStatus) = {
+      play.api.libs.json.JsString(obj.toString)
+    }
+
+    def jsObjectFixtureStatus(obj: com.giogar.football.data.v0.models.FixtureStatus) = {
+      play.api.libs.json.Json.obj("value" -> play.api.libs.json.JsString(obj.toString))
+    }
+
+    implicit def jsonWritesFootballDataFixtureStatus: play.api.libs.json.Writes[FixtureStatus] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.FixtureStatus] {
+        def writes(obj: com.giogar.football.data.v0.models.FixtureStatus) = {
+          jsonWritesFootballDataFixtureStatus(obj)
+        }
+      }
+    }
+
     implicit val jsonReadsFootballDataLeague = new play.api.libs.json.Reads[com.giogar.football.data.v0.models.League] {
       def reads(js: play.api.libs.json.JsValue): play.api.libs.json.JsResult[com.giogar.football.data.v0.models.League] = {
         js match {
@@ -232,6 +329,117 @@ package com.giogar.football.data.v0.models {
         }
       }
     }
+
+    implicit def jsonReadsFootballDataFixture: play.api.libs.json.Reads[Fixture] = {
+      (
+        (__ \ "date").read[_root_.org.joda.time.DateTime] and
+        (__ \ "status").read[com.giogar.football.data.v0.models.FixtureStatus] and
+        (__ \ "matchday").read[Int] and
+        (__ \ "homeTeamName").read[String] and
+        (__ \ "awayTeamName").read[String] and
+        (__ \ "result").read[com.giogar.football.data.v0.models.Result]
+      )(Fixture.apply _)
+    }
+
+    def jsObjectFixture(obj: com.giogar.football.data.v0.models.Fixture) = {
+      play.api.libs.json.Json.obj(
+        "date" -> play.api.libs.json.JsString(_root_.org.joda.time.format.ISODateTimeFormat.dateTime.print(obj.date)),
+        "status" -> play.api.libs.json.JsString(obj.status.toString),
+        "matchday" -> play.api.libs.json.JsNumber(obj.matchday),
+        "homeTeamName" -> play.api.libs.json.JsString(obj.homeTeamName),
+        "awayTeamName" -> play.api.libs.json.JsString(obj.awayTeamName),
+        "result" -> jsObjectResult(obj.result)
+      )
+    }
+
+    implicit def jsonWritesFootballDataFixture: play.api.libs.json.Writes[Fixture] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Fixture] {
+        def writes(obj: com.giogar.football.data.v0.models.Fixture) = {
+          jsObjectFixture(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataFixtures: play.api.libs.json.Reads[Fixtures] = {
+      (__ \ "fixtures").read[Seq[com.giogar.football.data.v0.models.Fixture]].map { x => new Fixtures(fixtures = x) }
+    }
+
+    def jsObjectFixtures(obj: com.giogar.football.data.v0.models.Fixtures) = {
+      play.api.libs.json.Json.obj(
+        "fixtures" -> play.api.libs.json.Json.toJson(obj.fixtures)
+      )
+    }
+
+    implicit def jsonWritesFootballDataFixtures: play.api.libs.json.Writes[Fixtures] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Fixtures] {
+        def writes(obj: com.giogar.football.data.v0.models.Fixtures) = {
+          jsObjectFixtures(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataResult: play.api.libs.json.Reads[Result] = {
+      (
+        (__ \ "goalsHomeTeam").readNullable[Int] and
+        (__ \ "goalsAwayTeam").readNullable[Int] and
+        (__ \ "halfTime").readNullable[com.giogar.football.data.v0.models.Score] and
+        (__ \ "extraTime").readNullable[com.giogar.football.data.v0.models.Score] and
+        (__ \ "penaltyShootout").readNullable[com.giogar.football.data.v0.models.Score]
+      )(Result.apply _)
+    }
+
+    def jsObjectResult(obj: com.giogar.football.data.v0.models.Result) = {
+      (obj.goalsHomeTeam match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("goalsHomeTeam" -> play.api.libs.json.JsNumber(x))
+      }) ++
+      (obj.goalsAwayTeam match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("goalsAwayTeam" -> play.api.libs.json.JsNumber(x))
+      }) ++
+      (obj.halfTime match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("halfTime" -> jsObjectScore(x))
+      }) ++
+      (obj.extraTime match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("extraTime" -> jsObjectScore(x))
+      }) ++
+      (obj.penaltyShootout match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("penaltyShootout" -> jsObjectScore(x))
+      })
+    }
+
+    implicit def jsonWritesFootballDataResult: play.api.libs.json.Writes[Result] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Result] {
+        def writes(obj: com.giogar.football.data.v0.models.Result) = {
+          jsObjectResult(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataScore: play.api.libs.json.Reads[Score] = {
+      (
+        (__ \ "goalsHomeTeam").read[Int] and
+        (__ \ "goalsAwayTeam").read[Int]
+      )(Score.apply _)
+    }
+
+    def jsObjectScore(obj: com.giogar.football.data.v0.models.Score) = {
+      play.api.libs.json.Json.obj(
+        "goalsHomeTeam" -> play.api.libs.json.JsNumber(obj.goalsHomeTeam),
+        "goalsAwayTeam" -> play.api.libs.json.JsNumber(obj.goalsAwayTeam)
+      )
+    }
+
+    implicit def jsonWritesFootballDataScore: play.api.libs.json.Writes[Score] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Score] {
+        def writes(obj: com.giogar.football.data.v0.models.Score) = {
+          jsObjectScore(obj)
+        }
+      }
+    }
   }
 }
 
@@ -260,6 +468,17 @@ package com.giogar.football.data.v0 {
 
     implicit val queryStringBindableTypeDateIso8601 = new QueryStringBindable.Parsing[org.joda.time.LocalDate](
       ISODateTimeFormat.yearMonthDay.parseLocalDate(_), _.toString, (key: String, e: _root_.java.lang.Exception) => s"Error parsing date $key. Example: 2014-04-29"
+    )
+
+    // Enum: FixtureStatus
+    private[this] val enumFixtureStatusNotFound = (key: String, e: _root_.java.lang.Exception) => s"Unrecognized $key, should be one of ${com.giogar.football.data.v0.models.FixtureStatus.all.mkString(", ")}"
+
+    implicit val pathBindableEnumFixtureStatus = new PathBindable.Parsing[com.giogar.football.data.v0.models.FixtureStatus] (
+      FixtureStatus.fromString(_).get, _.toString, enumFixtureStatusNotFound
+    )
+
+    implicit val queryStringBindableEnumFixtureStatus = new QueryStringBindable.Parsing[com.giogar.football.data.v0.models.FixtureStatus](
+      FixtureStatus.fromString(_).get, _.toString, enumFixtureStatusNotFound
     )
 
     // Enum: League
@@ -303,12 +522,26 @@ package com.giogar.football.data.v0 {
 
     def competitions: Competitions = Competitions
 
+    def fixtures: Fixtures = Fixtures
+
     object Competitions extends Competitions {
       override def get(
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Competition]] = {
         _executeRequest("GET", s"/competitions", requestHeaders = requestHeaders).map {
           case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("Seq[com.giogar.football.data.v0.models.Competition]", r, _.validate[Seq[com.giogar.football.data.v0.models.Competition]])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+    }
+
+    object Fixtures extends Fixtures {
+      override def getFixturesByCompetitionId(
+        competitionId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Fixtures] = {
+        _executeRequest("GET", s"/competitions/${competitionId}/fixtures", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("com.giogar.football.data.v0.models.Fixtures", r, _.validate[com.giogar.football.data.v0.models.Fixtures])
           case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
@@ -418,6 +651,7 @@ package com.giogar.football.data.v0 {
     trait Client {
       def baseUrl: String
       def competitions: com.giogar.football.data.v0.Competitions
+      def fixtures: com.giogar.football.data.v0.Fixtures
     }
 
   }
@@ -426,6 +660,13 @@ package com.giogar.football.data.v0 {
     def get(
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Competition]]
+  }
+
+  trait Fixtures {
+    def getFixturesByCompetitionId(
+      competitionId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Fixtures]
   }
 
   package errors {

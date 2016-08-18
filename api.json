@@ -49,6 +49,86 @@
           "description": "Timestamp of the last update"
         }
       ]
+    },
+    "fixture": {
+      "fields": [
+        {
+          "name": "date",
+          "type": "date-time-iso8601",
+          "description": "Event date and time"
+        },
+        {
+          "name": "status",
+          "type": "fixtureStatus",
+          "description": "Status of the Event"
+        },
+        {
+          "name": "matchday",
+          "type": "integer",
+          "description": "day of the fixture in the competition"
+        },
+        {
+          "name": "homeTeamName",
+          "type": "string"
+        },
+        {
+          "name": "awayTeamName",
+          "type": "string"
+        },
+        {
+          "name": "result",
+          "type": "result"
+        }
+      ]
+    },
+    "fixtures": {
+      "fields": [
+        {
+          "name": "fixtures",
+          "type": "[fixture]"
+        }
+      ]
+    },
+    "score": {
+      "fields": [
+        {
+          "name": "goalsHomeTeam",
+          "type": "integer"
+        },
+        {
+          "name": "goalsAwayTeam",
+          "type": "integer"
+        }
+      ]
+    },
+    "result": {
+      "fields": [
+        {
+          "name": "goalsHomeTeam",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "goalsAwayTeam",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "halfTime",
+          "type": "score",
+          "required": false
+        },
+        {
+          "name": "extraTime",
+          "type": "score",
+          "required": false
+        },
+        {
+          "name": "penaltyShootout",
+          "type": "score",
+          "required": false
+        }
+      ]
     }
   },
   "enums": {
@@ -145,6 +225,30 @@
           "description": "World-Cup"
         }
       ]
+    },
+    "fixtureStatus": {
+      "name": "fixtureStatus",
+      "description": "status of the fixture",
+      "values": [
+        {
+          "name": "SCHEDULED"
+        },
+        {
+          "name": "TIMED"
+        },
+        {
+          "name": "POSTPONED"
+        },
+        {
+          "name": "CANCELED"
+        },
+        {
+          "name": "IN_PLAY"
+        },
+        {
+          "name": "FINISHED"
+        }
+      ]
     }
   },
   "resources": {
@@ -156,6 +260,27 @@
           "responses": {
             "200": {
               "type": "[competition]"
+            }
+          }
+        }
+      ]
+    },
+    "fixture": {
+      "path": "/competitions",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/:competition_id/fixtures",
+          "parameters": [
+            {
+              "name": "competition_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "fixtures"
             }
           }
         }

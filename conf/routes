@@ -2,4 +2,5 @@
 # Service version: 0.0.1-dev
 # apidoc:0.11.33 http://www.apidoc.me/giannigar/football-data/0.0.1-dev/play_2_x_routes
 
-GET     /competitions     controllers.Competitions.get()
+GET     /competitions                              controllers.Competitions.get()
+GET     /competitions/:competition_id/fixtures     controllers.Fixtures.getFixturesByCompetitionId(competition_id: Long)
