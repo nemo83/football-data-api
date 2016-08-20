@@ -29,6 +29,34 @@ package com.giogar.football.data.v0.models {
     fixtures: Seq[com.giogar.football.data.v0.models.Fixture]
   )
 
+  case class LeaguePosition(
+    rank: Int,
+    team: String,
+    teamId: Long,
+    playedGames: Int,
+    crestURI: _root_.scala.Option[String] = None,
+    points: Int,
+    goals: Int,
+    goalsAgainst: Int,
+    goalDifference: Int
+  )
+
+  case class LeagueTable(
+    leagueCaption: String,
+    matchDay: Int,
+    standing: Seq[com.giogar.football.data.v0.models.LeaguePosition]
+  )
+
+  case class Player(
+    name: String,
+    position: String,
+    jerseyNumber: Int,
+    dateOfBirth: _root_.org.joda.time.LocalDate,
+    nationality: String,
+    contractUntil: _root_.org.joda.time.LocalDate,
+    marketValue: String
+  )
+
   case class Result(
     goalsHomeTeam: _root_.scala.Option[Int] = None,
     goalsAwayTeam: _root_.scala.Option[Int] = None,
@@ -40,6 +68,18 @@ package com.giogar.football.data.v0.models {
   case class Score(
     goalsHomeTeam: Int,
     goalsAwayTeam: Int
+  )
+
+  case class Team(
+    name: String,
+    code: _root_.scala.Option[String] = None,
+    shortName: _root_.scala.Option[String] = None,
+    squadMarketValue: _root_.scala.Option[String] = None,
+    crestUrl: _root_.scala.Option[String] = None
+  )
+
+  case class Teams(
+    teams: Seq[com.giogar.football.data.v0.models.Team]
   )
 
   /**
@@ -378,6 +418,100 @@ package com.giogar.football.data.v0.models {
       }
     }
 
+    implicit def jsonReadsFootballDataLeaguePosition: play.api.libs.json.Reads[LeaguePosition] = {
+      (
+        (__ \ "rank").read[Int] and
+        (__ \ "team").read[String] and
+        (__ \ "teamId").read[Long] and
+        (__ \ "playedGames").read[Int] and
+        (__ \ "crestURI").readNullable[String] and
+        (__ \ "points").read[Int] and
+        (__ \ "goals").read[Int] and
+        (__ \ "goalsAgainst").read[Int] and
+        (__ \ "goalDifference").read[Int]
+      )(LeaguePosition.apply _)
+    }
+
+    def jsObjectLeaguePosition(obj: com.giogar.football.data.v0.models.LeaguePosition) = {
+      play.api.libs.json.Json.obj(
+        "rank" -> play.api.libs.json.JsNumber(obj.rank),
+        "team" -> play.api.libs.json.JsString(obj.team),
+        "teamId" -> play.api.libs.json.JsNumber(obj.teamId),
+        "playedGames" -> play.api.libs.json.JsNumber(obj.playedGames),
+        "points" -> play.api.libs.json.JsNumber(obj.points),
+        "goals" -> play.api.libs.json.JsNumber(obj.goals),
+        "goalsAgainst" -> play.api.libs.json.JsNumber(obj.goalsAgainst),
+        "goalDifference" -> play.api.libs.json.JsNumber(obj.goalDifference)
+      ) ++ (obj.crestURI match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("crestURI" -> play.api.libs.json.JsString(x))
+      })
+    }
+
+    implicit def jsonWritesFootballDataLeaguePosition: play.api.libs.json.Writes[LeaguePosition] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.LeaguePosition] {
+        def writes(obj: com.giogar.football.data.v0.models.LeaguePosition) = {
+          jsObjectLeaguePosition(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataLeagueTable: play.api.libs.json.Reads[LeagueTable] = {
+      (
+        (__ \ "leagueCaption").read[String] and
+        (__ \ "matchDay").read[Int] and
+        (__ \ "standing").read[Seq[com.giogar.football.data.v0.models.LeaguePosition]]
+      )(LeagueTable.apply _)
+    }
+
+    def jsObjectLeagueTable(obj: com.giogar.football.data.v0.models.LeagueTable) = {
+      play.api.libs.json.Json.obj(
+        "leagueCaption" -> play.api.libs.json.JsString(obj.leagueCaption),
+        "matchDay" -> play.api.libs.json.JsNumber(obj.matchDay),
+        "standing" -> play.api.libs.json.Json.toJson(obj.standing)
+      )
+    }
+
+    implicit def jsonWritesFootballDataLeagueTable: play.api.libs.json.Writes[LeagueTable] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.LeagueTable] {
+        def writes(obj: com.giogar.football.data.v0.models.LeagueTable) = {
+          jsObjectLeagueTable(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataPlayer: play.api.libs.json.Reads[Player] = {
+      (
+        (__ \ "name").read[String] and
+        (__ \ "position").read[String] and
+        (__ \ "jerseyNumber").read[Int] and
+        (__ \ "dateOfBirth").read[_root_.org.joda.time.LocalDate] and
+        (__ \ "nationality").read[String] and
+        (__ \ "contractUntil").read[_root_.org.joda.time.LocalDate] and
+        (__ \ "marketValue").read[String]
+      )(Player.apply _)
+    }
+
+    def jsObjectPlayer(obj: com.giogar.football.data.v0.models.Player) = {
+      play.api.libs.json.Json.obj(
+        "name" -> play.api.libs.json.JsString(obj.name),
+        "position" -> play.api.libs.json.JsString(obj.position),
+        "jerseyNumber" -> play.api.libs.json.JsNumber(obj.jerseyNumber),
+        "dateOfBirth" -> play.api.libs.json.JsString(obj.dateOfBirth.toString),
+        "nationality" -> play.api.libs.json.JsString(obj.nationality),
+        "contractUntil" -> play.api.libs.json.JsString(obj.contractUntil.toString),
+        "marketValue" -> play.api.libs.json.JsString(obj.marketValue)
+      )
+    }
+
+    implicit def jsonWritesFootballDataPlayer: play.api.libs.json.Writes[Player] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Player] {
+        def writes(obj: com.giogar.football.data.v0.models.Player) = {
+          jsObjectPlayer(obj)
+        }
+      }
+    }
+
     implicit def jsonReadsFootballDataResult: play.api.libs.json.Reads[Result] = {
       (
         (__ \ "goalsHomeTeam").readNullable[Int] and
@@ -437,6 +571,63 @@ package com.giogar.football.data.v0.models {
       new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Score] {
         def writes(obj: com.giogar.football.data.v0.models.Score) = {
           jsObjectScore(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataTeam: play.api.libs.json.Reads[Team] = {
+      (
+        (__ \ "name").read[String] and
+        (__ \ "code").readNullable[String] and
+        (__ \ "shortName").readNullable[String] and
+        (__ \ "squadMarketValue").readNullable[String] and
+        (__ \ "crestUrl").readNullable[String]
+      )(Team.apply _)
+    }
+
+    def jsObjectTeam(obj: com.giogar.football.data.v0.models.Team) = {
+      play.api.libs.json.Json.obj(
+        "name" -> play.api.libs.json.JsString(obj.name)
+      ) ++ (obj.code match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("code" -> play.api.libs.json.JsString(x))
+      }) ++
+      (obj.shortName match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("shortName" -> play.api.libs.json.JsString(x))
+      }) ++
+      (obj.squadMarketValue match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("squadMarketValue" -> play.api.libs.json.JsString(x))
+      }) ++
+      (obj.crestUrl match {
+        case None => play.api.libs.json.Json.obj()
+        case Some(x) => play.api.libs.json.Json.obj("crestUrl" -> play.api.libs.json.JsString(x))
+      })
+    }
+
+    implicit def jsonWritesFootballDataTeam: play.api.libs.json.Writes[Team] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Team] {
+        def writes(obj: com.giogar.football.data.v0.models.Team) = {
+          jsObjectTeam(obj)
+        }
+      }
+    }
+
+    implicit def jsonReadsFootballDataTeams: play.api.libs.json.Reads[Teams] = {
+      (__ \ "teams").read[Seq[com.giogar.football.data.v0.models.Team]].map { x => new Teams(teams = x) }
+    }
+
+    def jsObjectTeams(obj: com.giogar.football.data.v0.models.Teams) = {
+      play.api.libs.json.Json.obj(
+        "teams" -> play.api.libs.json.Json.toJson(obj.teams)
+      )
+    }
+
+    implicit def jsonWritesFootballDataTeams: play.api.libs.json.Writes[Teams] = {
+      new play.api.libs.json.Writes[com.giogar.football.data.v0.models.Teams] {
+        def writes(obj: com.giogar.football.data.v0.models.Teams) = {
+          jsObjectTeams(obj)
         }
       }
     }
@@ -522,7 +713,7 @@ package com.giogar.football.data.v0 {
 
     def competitions: Competitions = Competitions
 
-    def fixtures: Fixtures = Fixtures
+    def teams: Teams = Teams
 
     object Competitions extends Competitions {
       override def get(
@@ -533,15 +724,65 @@ package com.giogar.football.data.v0 {
           case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
-    }
 
-    object Fixtures extends Fixtures {
+      override def getTeamsByCompetitionId(
+        competitionId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Teams] = {
+        _executeRequest("GET", s"/competitions/${competitionId}/teams", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("com.giogar.football.data.v0.models.Teams", r, _.validate[com.giogar.football.data.v0.models.Teams])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+
       override def getFixturesByCompetitionId(
         competitionId: Long,
         requestHeaders: Seq[(String, String)] = Nil
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Fixtures] = {
         _executeRequest("GET", s"/competitions/${competitionId}/fixtures", requestHeaders = requestHeaders).map {
           case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("com.giogar.football.data.v0.models.Fixtures", r, _.validate[com.giogar.football.data.v0.models.Fixtures])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+
+      override def getLeagueTableByCompetitionId(
+        competitionId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.LeagueTable] = {
+        _executeRequest("GET", s"/competitions/${competitionId}/leagueTable", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("com.giogar.football.data.v0.models.LeagueTable", r, _.validate[com.giogar.football.data.v0.models.LeagueTable])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+    }
+
+    object Teams extends Teams {
+      override def getByTeamId(
+        teamId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Team] = {
+        _executeRequest("GET", s"/teams/${teamId}", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("com.giogar.football.data.v0.models.Team", r, _.validate[com.giogar.football.data.v0.models.Team])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+
+      override def getFixturesByTeamId(
+        teamId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Fixtures]] = {
+        _executeRequest("GET", s"/teams/${teamId}/fixtures", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("Seq[com.giogar.football.data.v0.models.Fixtures]", r, _.validate[Seq[com.giogar.football.data.v0.models.Fixtures]])
+          case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+
+      override def getPlayersByTeamId(
+        teamId: Long,
+        requestHeaders: Seq[(String, String)] = Nil
+      )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Player]] = {
+        _executeRequest("GET", s"/teams/${teamId}/players", requestHeaders = requestHeaders).map {
+          case r if r.status == 200 => _root_.com.giogar.football.data.v0.Client.parseJson("Seq[com.giogar.football.data.v0.models.Player]", r, _.validate[Seq[com.giogar.football.data.v0.models.Player]])
           case r => throw new com.giogar.football.data.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
         }
       }
@@ -651,7 +892,7 @@ package com.giogar.football.data.v0 {
     trait Client {
       def baseUrl: String
       def competitions: com.giogar.football.data.v0.Competitions
-      def fixtures: com.giogar.football.data.v0.Fixtures
+      def teams: com.giogar.football.data.v0.Teams
     }
 
   }
@@ -660,13 +901,38 @@ package com.giogar.football.data.v0 {
     def get(
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Competition]]
-  }
 
-  trait Fixtures {
+    def getTeamsByCompetitionId(
+      competitionId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Teams]
+
     def getFixturesByCompetitionId(
       competitionId: Long,
       requestHeaders: Seq[(String, String)] = Nil
     )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Fixtures]
+
+    def getLeagueTableByCompetitionId(
+      competitionId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.LeagueTable]
+  }
+
+  trait Teams {
+    def getByTeamId(
+      teamId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[com.giogar.football.data.v0.models.Team]
+
+    def getFixturesByTeamId(
+      teamId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Fixtures]]
+
+    def getPlayersByTeamId(
+      teamId: Long,
+      requestHeaders: Seq[(String, String)] = Nil
+    )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[com.giogar.football.data.v0.models.Player]]
   }
 
   package errors {

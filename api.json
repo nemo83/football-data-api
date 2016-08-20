@@ -129,6 +129,131 @@
           "required": false
         }
       ]
+    },
+    "team": {
+      "fields": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "code",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "shortName",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "squadMarketValue",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "crestUrl",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    "teams": {
+      "fields": [
+        {
+          "name": "teams",
+          "type": "[team]"
+        }
+      ]
+    },
+    "player": {
+      "fields": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "position",
+          "type": "string"
+        },
+        {
+          "name": "jerseyNumber",
+          "type": "integer"
+        },
+        {
+          "name": "dateOfBirth",
+          "type": "date-iso8601"
+        },
+        {
+          "name": "nationality",
+          "type": "string"
+        },
+        {
+          "name": "contractUntil",
+          "type": "date-iso8601"
+        },
+        {
+          "name": "marketValue",
+          "type": "string"
+        }
+      ]
+    },
+    "leaguePosition": {
+      "fields": [
+        {
+          "name": "rank",
+          "type": "integer"
+        },
+        {
+          "name": "team",
+          "type": "string"
+        },
+        {
+          "name": "teamId",
+          "type": "long"
+        },
+        {
+          "name": "playedGames",
+          "type": "integer"
+        },
+        {
+          "name": "crestURI",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "points",
+          "type": "integer"
+        },
+        {
+          "name": "goals",
+          "type": "integer"
+        },
+        {
+          "name": "goalsAgainst",
+          "type": "integer"
+        },
+        {
+          "name": "goalDifference",
+          "type": "integer"
+        }
+      ]
+    },
+    "leagueTable": {
+      "fields": [
+        {
+          "name": "leagueCaption",
+          "type": "string"
+        },
+        {
+          "name": "matchDay",
+          "type": "integer"
+        },
+        {
+          "name": "standing",
+          "type": "[leaguePosition]"
+        }
+      ]
     }
   },
   "enums": {
@@ -262,12 +387,23 @@
               "type": "[competition]"
             }
           }
-        }
-      ]
-    },
-    "fixture": {
-      "path": "/competitions",
-      "operations": [
+        },
+        {
+          "method": "GET",
+          "path": "/:competition_id/teams",
+          "parameters": [
+            {
+              "name": "competition_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "teams"
+            }
+          }
+        },
         {
           "method": "GET",
           "path": "/:competition_id/fixtures",
@@ -281,6 +417,75 @@
           "responses": {
             "200": {
               "type": "fixtures"
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/:competition_id/leagueTable",
+          "parameters": [
+            {
+              "name": "competition_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "leagueTable"
+            }
+          }
+        }
+      ]
+    },
+    "team": {
+      "path": "/teams",
+      "operations": [
+        {
+          "method": "GET",
+          "path": "/:team_id",
+          "parameters": [
+            {
+              "name": "team_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "team"
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/:team_id/fixtures",
+          "parameters": [
+            {
+              "name": "team_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "[fixtures]"
+            }
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/:team_id/players",
+          "parameters": [
+            {
+              "name": "team_id",
+              "type": "long",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "type": "[player]"
             }
           }
         }

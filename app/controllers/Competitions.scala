@@ -15,4 +15,16 @@ class Competitions extends Controller {
     competitionsClient.get().map(competitions => Ok(Json.toJson(competitions)))
   }
 
+  def getTeamsByCompetitionId(competition_id: Long) = Action.async {
+    competitionsClient.getTeamsByCompetitionId(competition_id).map(teams => Ok(Json.toJson(teams)))
+  }
+
+  def getFixturesByCompetitionId(competitionId: Long) = Action.async {
+    competitionsClient.getFixturesByCompetitionId(competitionId).map(fixturesClient => Ok(Json.toJson(fixturesClient)))
+  }
+
+  def getLeagueTableByCompetitionId(competitionId: Long) = Action.async {
+    competitionsClient.getLeagueTableByCompetitionId(competitionId).map(leagueTable => Ok(Json.toJson(leagueTable)))
+  }
+
 }
